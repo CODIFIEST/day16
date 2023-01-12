@@ -42,10 +42,22 @@ class Character {
         if (this.activeSpell) {
             str += `Active Spell: ${this.activeSpell} <br/>`
         }
+        if (this.pets[0]){
+            str+=`Available Pets: <br/>`
+            for (let i=0;i<this.pets.length;i++){
+                str+=`${this.pets[i].name} does ${this.pets[i].damage} damage <br />`
+            }
+        }
         if (this.spells[0]){
             str+= `Available Spells: <br />`
             for (let i=0; i<this.spells.length;i++){
                 str +=`${this.spells[i].name} does ${this.spells[i].power} damage <br />`
+            }
+        }
+        if(this.weapons[0]){
+            str+=`Available Weapons: <br/>`
+            for(let i=0;i<this.weapons.length;i++){
+                str+=`${this.weapons[i].name} does ${this.weapons[i].damage} damage <br/>`
             }
         }
         return str;

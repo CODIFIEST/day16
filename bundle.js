@@ -43,10 +43,22 @@ class Character {
         if (this.activeSpell) {
             str += `Active Spell: ${this.activeSpell} <br/>`
         }
+        if (this.pets[0]){
+            str+=`Available Pets: <br/>`
+            for (let i=0;i<this.pets.length;i++){
+                str+=`${this.pets[i].name} does ${this.pets[i].damage} damage <br />`
+            }
+        }
         if (this.spells[0]){
             str+= `Available Spells: <br />`
             for (let i=0; i<this.spells.length;i++){
                 str +=`${this.spells[i].name} does ${this.spells[i].power} damage <br />`
+            }
+        }
+        if(this.weapons[0]){
+            str+=`Available Weapons: <br/>`
+            for(let i=0;i<this.weapons.length;i++){
+                str+=`${this.weapons[i].name} does ${this.weapons[i].damage} damage <br/>`
             }
         }
         return str;
@@ -223,7 +235,7 @@ const chokesmoke = require("../spells/chokesmoke");
 class Shaman extends Character {
     constructor (name, health){
         //Create the pet inside the constructor like from class
-        super (name, config.classNames.ShamanClassName, 60, 6, 8, 3, 1000, 100);
+        super (name, config.classNames.ShamanClassName, 6, 6, 8, 3, 1000, 100);
         const pet = new Pet("shroom", 10, "hero's dose");
         this.pets = [];
         this.pets.push(pet);
@@ -375,6 +387,7 @@ async function gameLoop() {
         console.log(choice)
 
         characterDamage = character.getDamage(choice);
+        
         mobdamage = randomMobber.getDamage();
 console.log("char damage ", characterDamage);
 console.log(mobdamage);
@@ -411,7 +424,7 @@ function displaySpellChoices(character){
         const spellChoicesContainer = document.getElementById("spell-choices-container")
         for(let i=0; i< character.spells.length; i++){
             const mySpell = document.createElement("button")
-            mySpell.classList.add(`#spell${i}`)
+            mySpell.id =`spell${i}`
             spellChoicesContainer.appendChild(mySpell)
             // const mySpell = document.getElementById(`spell${i}`)
             mySpell.innerHTML = character.spells[i].name;
@@ -421,20 +434,44 @@ function displaySpellChoices(character){
     }
 }
 
+function waitForSpellChoice(character){
+    let spellChoice;
+    const spell0button = document.getElementById("spell0");
+    const spell1button = document.getElementById("spell1");
+    const spell2button = document.getElementById("spell2");
+    return new Promise((resolve)=>{
+        spell0button.addEventListener("click", ()=>{
+            spellChoice = character.spells[0].name;
+            console.log(spellChoice)
+            resolve(spellChoice);
+        })
+        spell1button.addEventListener("click",()=>{
+            spellChoice = character.spells[1].name;
+            console.log(spellChoice)
+            resolve(spellChoice);
+        })
+        spell2button.addEventListener("click",()=>{
+            spellChoice = character.spells[2].name;
+            console.log(spellChoice)
+            resolve(spellChoice);
+        })
+    })
+}
+
+
 function waitForChoice(character) {
     const fightButton = document.getElementById("attack")
     const spellButton = document.getElementById("cast-spell")
-    const spell0button = document.getElementById("spell0")
-    const spell1button = document.getElementById("spell1")
-    const spell2button = document.getElementById("spell2")
+    console.log(`here i am bo ${character}`)
     return new Promise((resolve)=>{
         fightButton.addEventListener("click", ()=>{
             resolve("fight");  
         })
         spellButton.addEventListener("click", ()=>{
-            displaySpellChoices(character);
-            
-            resolve("fireball")
+            displaySpellChoices();
+            let spellChoice = waitForSpellChoice(character);
+            console.log(spellChoice)
+            resolve(spellChoice)
 
         })
     });

@@ -53,6 +53,7 @@ async function gameLoop() {
         console.log(choice)
 
         characterDamage = character.getDamage(choice);
+        
         mobdamage = randomMobber.getDamage();
 console.log("char damage ", characterDamage);
 console.log(mobdamage);
@@ -89,7 +90,7 @@ function displaySpellChoices(character){
         const spellChoicesContainer = document.getElementById("spell-choices-container")
         for(let i=0; i< character.spells.length; i++){
             const mySpell = document.createElement("button")
-            mySpell.classList.add(`#spell${i}`)
+            mySpell.id =`spell${i}`
             spellChoicesContainer.appendChild(mySpell)
             // const mySpell = document.getElementById(`spell${i}`)
             mySpell.innerHTML = character.spells[i].name;
@@ -99,20 +100,44 @@ function displaySpellChoices(character){
     }
 }
 
+function waitForSpellChoice(character){
+    let spellChoice;
+    const spell0button = document.getElementById("spell0");
+    const spell1button = document.getElementById("spell1");
+    const spell2button = document.getElementById("spell2");
+    return new Promise((resolve)=>{
+        spell0button.addEventListener("click", ()=>{
+            spellChoice = character.spells[0].name;
+            console.log(spellChoice)
+            resolve(spellChoice);
+        })
+        spell1button.addEventListener("click",()=>{
+            spellChoice = character.spells[1].name;
+            console.log(spellChoice)
+            resolve(spellChoice);
+        })
+        spell2button.addEventListener("click",()=>{
+            spellChoice = character.spells[2].name;
+            console.log(spellChoice)
+            resolve(spellChoice);
+        })
+    })
+}
+
+
 function waitForChoice(character) {
     const fightButton = document.getElementById("attack")
     const spellButton = document.getElementById("cast-spell")
-    const spell0button = document.getElementById("spell0")
-    const spell1button = document.getElementById("spell1")
-    const spell2button = document.getElementById("spell2")
+    console.log(`here i am bo ${character}`)
     return new Promise((resolve)=>{
         fightButton.addEventListener("click", ()=>{
             resolve("fight");  
         })
         spellButton.addEventListener("click", ()=>{
-            displaySpellChoices(character);
-            
-            resolve("fireball")
+            displaySpellChoices();
+            let spellChoice = waitForSpellChoice(character);
+            console.log(spellChoice)
+            resolve(spellChoice)
 
         })
     });

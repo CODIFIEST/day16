@@ -9,7 +9,7 @@ const chokesmoke = require("../spells/chokesmoke");
 class Shaman extends Character {
     constructor (name, health){
         //Create the pet inside the constructor like from class
-        super (name, config.classNames.ShamanClassName, 60, 6, 8, 3, 1000, 100);
+        super (name, config.classNames.ShamanClassName, 6, 6, 8, 3, 1000, 100);
         const pet = new Pet("shroom", 10, "hero's dose");
         this.pets = [];
         this.pets.push(pet);
