@@ -7,7 +7,9 @@
 const resolve = require("esmify/resolve");
 const chooseClass = require("./chooseClass");
 const displayCharacterInfo = require("./displayCharacterInfo");
+const displayChoices = require("./displayChoices");
 const displayMobInfo = require("./displayMobInfo");
+const loadButtons = require("./loadButtons");
 const setRandomMobber = require("./setrandomMobber");
 const toggleCharacterDisplay = require("./toggleCharacterDisplay");
 // this will be the character chosen by the player
@@ -38,37 +40,7 @@ function initGame(classType) {
     loadButtons(character);
     gameLoop();
 }
-function loadButtons(character) {
-    if (character.spells[0]) {
-        const spellChoicesContainer = document.getElementById("spell-choices-container")
-        for (let i = 0; i < character.spells.length; i++) {
-            const mySpell = document.createElement("button")
-            mySpell.id = `spell${i}`
-            spellChoicesContainer.appendChild(mySpell)
-            // const mySpell = document.getElementById(`spell${i}`)
-            mySpell.innerHTML = character.spells[i].name;
-        }
-    }
-    if (character.weapons[0]) {
-        const weaponChoicesContainer = document.getElementById("weapon-choices-container")
-        for (let i = 0; i < character.weapons.length; i++) {
-            const myWeapon = document.createElement("button")
-            myWeapon.id = `weapon${i}`
-            weaponChoicesContainer.appendChild(myWeapon)
-            myWeapon.innerHTML = character.weapons[i].name;
-        }
-    }
-    if (character.pets[0]) {
-        const petChoicesContainer = document.getElementById("pet-choices-container")
-        for (let i = 0; i < character.pets.length; i++) {
-            const mypet = document.createElement("button")
-            mypet.id = `pet${i}`
-            petChoicesContainer.appendChild(mypet)
-            mypet.innerHTML = character.pets[i].name;
-        }
-    }
 
-}
 // gameloop starts with character created and info displayed but no other data initialized
 async function gameLoop() {
     randomMobber = setRandomMobber();
@@ -81,49 +53,29 @@ async function gameLoop() {
 
         //now wait for the user to click a button
         const choice = await waitForChoice(character);
-        console.log(choice)
 
         characterDamage = character.getDamage(choice);
-
         mobdamage = randomMobber.getDamage();
-        console.log("char damage ", characterDamage);
-        console.log(mobdamage);
         character.health -= mobdamage;
         randomMobber.health -= characterDamage;
+        
         hideButtons();
-        displayCharacterInfo(character);
         displayMobInfo(randomMobber);
+        //this loop checks for dead mobbers and end of game
         if (randomMobber.getHealth() < 1) {
-            if (randomMobber.length > 0) {
+            if (mobs.length > 0) {
                 randomMobber = setRandomMobber();
                 displayMobInfo(randomMobber);
+            }else {
+            alert("You win")//this is the end of the game
             }
-
+            character.levelUp();
+            //this is where the round winning sound/animation goes
         }
-
+        displayCharacterInfo(character);
     }
 }
-// this function dispalys the choices a character has
-// only display cast spell button if the character has spells
-//only display weapons or pets buttons if the character has those.
-function displayChoices(character) {
 
-    const container = document.getElementById("choices-container")
-    container.style.display = "block"
-    if (!character.spells[0]) {
-        const castSpellButton = document.getElementById("cast-spell")
-        castSpellButton.style.display = "none"
-    }
-    if (!character.weapons[0]) {
-        const equipEaponButton = document.getElementById("equip-weapon")
-        equipEaponButton.style.display = "none";
-    }
-    if (!character.pets[0]) {
-        const summonPetButton = document.getElementById("summon-pet")
-        summonPetButton.style.display = "none";
-    }
-
-}
 function displaySpellChoices(character) {
     if (character.spells[0]) {
         const spellChoicesContainer = document.getElementById("spell-choices-container")

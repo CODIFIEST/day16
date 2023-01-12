@@ -199,7 +199,7 @@ class Character {
 }
 
 module.exports = Character;
-},{"../config/config":7,"../spells/spell":49}],2:[function(require,module,exports){
+},{"../config/config":7,"../spells/spell":51}],2:[function(require,module,exports){
 const Character = require("./character")
 const fireball = require("../spells/fireball");
 const config = require("../config/config");
@@ -210,7 +210,7 @@ class Mage extends Character{
     }
 }
 module.exports = Mage;
-},{"../config/config":7,"../spells/fireball":46,"./character":1}],3:[function(require,module,exports){
+},{"../config/config":7,"../spells/fireball":48,"./character":1}],3:[function(require,module,exports){
 class Pet{
     constructor(name, damage, damageType){
         this.name = name;
@@ -247,7 +247,7 @@ class Shaman extends Character {
     }
 }
 module.exports = Shaman;
-},{"../config/config":7,"../spells/chokesmoke":45,"../spells/lightheal":47,"../spells/poisoncloud":48,"../weapons/bastardsword":51,"../weapons/morningstar":52,"./character":1,"./pet":3}],5:[function(require,module,exports){
+},{"../config/config":7,"../spells/chokesmoke":47,"../spells/lightheal":49,"../spells/poisoncloud":50,"../weapons/bastardsword":53,"../weapons/morningstar":54,"./character":1,"./pet":3}],5:[function(require,module,exports){
 const Pet = require("./pet")
 const Character = require ("./character");
 const config = require("../config/config");
@@ -320,6 +320,29 @@ function displayCharacterInfo(character){
     };
     module.exports = displayCharacterInfo
 },{}],9:[function(require,module,exports){
+// this function dispalys the choices a character has
+// only display cast spell button if the character has spells
+//only display weapons or pets buttons if the character has those.
+function displayChoices(character) {
+
+    const container = document.getElementById("choices-container")
+    container.style.display = "block"
+    if (!character.spells[0]) {
+        const castSpellButton = document.getElementById("cast-spell")
+        castSpellButton.style.display = "none"
+    }
+    if (!character.weapons[0]) {
+        const equipEaponButton = document.getElementById("equip-weapon")
+        equipEaponButton.style.display = "none";
+    }
+    if (!character.pets[0]) {
+        const summonPetButton = document.getElementById("summon-pet")
+        summonPetButton.style.display = "none";
+    }
+
+}
+module.exports = displayChoices
+},{}],10:[function(require,module,exports){
 
 // displayMobInfo displays the random mobber's info to the screen
 // it takes an argument of the random mobber
@@ -331,7 +354,7 @@ function displayMobInfo(randomMobber){
     container.innerHTML = mobInfoString;
 }
 module.exports = displayMobInfo
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 // main game loop file
 // let  a user create a character from a list of the given classes.
 //the variable character is goig to represent my character in the game
@@ -341,7 +364,9 @@ module.exports = displayMobInfo
 const resolve = require("esmify/resolve");
 const chooseClass = require("./chooseClass");
 const displayCharacterInfo = require("./displayCharacterInfo");
+const displayChoices = require("./displayChoices");
 const displayMobInfo = require("./displayMobInfo");
+const loadButtons = require("./loadButtons");
 const setRandomMobber = require("./setrandomMobber");
 const toggleCharacterDisplay = require("./toggleCharacterDisplay");
 // this will be the character chosen by the player
@@ -372,37 +397,7 @@ function initGame(classType) {
     loadButtons(character);
     gameLoop();
 }
-function loadButtons(character) {
-    if (character.spells[0]) {
-        const spellChoicesContainer = document.getElementById("spell-choices-container")
-        for (let i = 0; i < character.spells.length; i++) {
-            const mySpell = document.createElement("button")
-            mySpell.id = `spell${i}`
-            spellChoicesContainer.appendChild(mySpell)
-            // const mySpell = document.getElementById(`spell${i}`)
-            mySpell.innerHTML = character.spells[i].name;
-        }
-    }
-    if (character.weapons[0]) {
-        const weaponChoicesContainer = document.getElementById("weapon-choices-container")
-        for (let i = 0; i < character.weapons.length; i++) {
-            const myWeapon = document.createElement("button")
-            myWeapon.id = `weapon${i}`
-            weaponChoicesContainer.appendChild(myWeapon)
-            myWeapon.innerHTML = character.weapons[i].name;
-        }
-    }
-    if (character.pets[0]) {
-        const petChoicesContainer = document.getElementById("pet-choices-container")
-        for (let i = 0; i < character.pets.length; i++) {
-            const mypet = document.createElement("button")
-            mypet.id = `pet${i}`
-            petChoicesContainer.appendChild(mypet)
-            mypet.innerHTML = character.pets[i].name;
-        }
-    }
 
-}
 // gameloop starts with character created and info displayed but no other data initialized
 async function gameLoop() {
     randomMobber = setRandomMobber();
@@ -415,49 +410,29 @@ async function gameLoop() {
 
         //now wait for the user to click a button
         const choice = await waitForChoice(character);
-        console.log(choice)
 
         characterDamage = character.getDamage(choice);
-
         mobdamage = randomMobber.getDamage();
-        console.log("char damage ", characterDamage);
-        console.log(mobdamage);
         character.health -= mobdamage;
         randomMobber.health -= characterDamage;
+        
         hideButtons();
-        displayCharacterInfo(character);
         displayMobInfo(randomMobber);
+        //this loop checks for dead mobbers and end of game
         if (randomMobber.getHealth() < 1) {
-            if (randomMobber.length > 0) {
+            if (mobs.length > 0) {
                 randomMobber = setRandomMobber();
                 displayMobInfo(randomMobber);
+            }else {
+            alert("You win")//this is the end of the game
             }
-
+            character.levelUp();
+            //this is where the round winning sound/animation goes
         }
-
+        displayCharacterInfo(character);
     }
 }
-// this function dispalys the choices a character has
-// only display cast spell button if the character has spells
-//only display weapons or pets buttons if the character has those.
-function displayChoices(character) {
 
-    const container = document.getElementById("choices-container")
-    container.style.display = "block"
-    if (!character.spells[0]) {
-        const castSpellButton = document.getElementById("cast-spell")
-        castSpellButton.style.display = "none"
-    }
-    if (!character.weapons[0]) {
-        const equipEaponButton = document.getElementById("equip-weapon")
-        equipEaponButton.style.display = "none";
-    }
-    if (!character.pets[0]) {
-        const summonPetButton = document.getElementById("summon-pet")
-        summonPetButton.style.display = "none";
-    }
-
-}
 function displaySpellChoices(character) {
     if (character.spells[0]) {
         const spellChoicesContainer = document.getElementById("spell-choices-container")
@@ -605,17 +580,51 @@ function waitForChoice(character) {
 
 }
 
-},{"./chooseClass":6,"./displayCharacterInfo":8,"./displayMobInfo":9,"./setrandomMobber":44,"./toggleCharacterDisplay":50,"esmify/resolve":23}],11:[function(require,module,exports){
+},{"./chooseClass":6,"./displayCharacterInfo":8,"./displayChoices":9,"./displayMobInfo":10,"./loadButtons":12,"./setrandomMobber":46,"./toggleCharacterDisplay":52,"esmify/resolve":25}],12:[function(require,module,exports){
+
+function loadButtons(character) {
+    if (character.spells[0]) {
+        const spellChoicesContainer = document.getElementById("spell-choices-container")
+        for (let i = 0; i < character.spells.length; i++) {
+            const mySpell = document.createElement("button")
+            mySpell.id = `spell${i}`
+            spellChoicesContainer.appendChild(mySpell)
+            // const mySpell = document.getElementById(`spell${i}`)
+            mySpell.innerHTML = character.spells[i].name;
+        }
+    }
+    if (character.weapons[0]) {
+        const weaponChoicesContainer = document.getElementById("weapon-choices-container")
+        for (let i = 0; i < character.weapons.length; i++) {
+            const myWeapon = document.createElement("button")
+            myWeapon.id = `weapon${i}`
+            weaponChoicesContainer.appendChild(myWeapon)
+            myWeapon.innerHTML = character.weapons[i].name;
+        }
+    }
+    if (character.pets[0]) {
+        const petChoicesContainer = document.getElementById("pet-choices-container")
+        for (let i = 0; i < character.pets.length; i++) {
+            const mypet = document.createElement("button")
+            mypet.id = `pet${i}`
+            petChoicesContainer.appendChild(mypet)
+            mypet.innerHTML = character.pets[i].name;
+        }
+    }
+
+}
+module.exports = loadButtons
+},{}],13:[function(require,module,exports){
 const config = require("../config/config")
 const Mob = require("./mob")
 const darklord = new Mob(config.mobNames.darklord,70,100)
 module.exports = darklord;
-},{"../config/config":7,"./mob":13}],12:[function(require,module,exports){
+},{"../config/config":7,"./mob":15}],14:[function(require,module,exports){
 const config = require("../config/config");
 const Mob = require("./mob")
 const goblin = new Mob(config.mobNames.goblin, 10, 29);
 module.exports = goblin;
-},{"../config/config":7,"./mob":13}],13:[function(require,module,exports){
+},{"../config/config":7,"./mob":15}],15:[function(require,module,exports){
 class Mob {
     constructor(name, damage, health){
         this.name = name;
@@ -633,7 +642,7 @@ class Mob {
     }
 }
 module.exports = Mob;
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 //Create a mobs folder, mobs class, and some mobs, as well as a mobs array that stores all your mobs.
 const darklord = require("./darklord")
 
@@ -659,22 +668,22 @@ mobs = [
     shedevil
 ]
 module.exports = mobs;
-},{"./darklord":11,"./goblin":12,"./ork":15,"./pteradactyl":16,"./shedevil":17}],15:[function(require,module,exports){
+},{"./darklord":13,"./goblin":14,"./ork":17,"./pteradactyl":18,"./shedevil":19}],17:[function(require,module,exports){
 const config = require("../config/config")
 const Mob = require("./mob")
 const ork = new Mob(config.mobNames.ork, 20, 21)
 module.exports = ork;
-},{"../config/config":7,"./mob":13}],16:[function(require,module,exports){
+},{"../config/config":7,"./mob":15}],18:[function(require,module,exports){
 const config = require("../config/config")
 const Mob = require("./mob")
 const pteradactyl = new Mob(config.mobNames.pteradactyl, 15, 40)
 module.exports = pteradactyl;
-},{"../config/config":7,"./mob":13}],17:[function(require,module,exports){
+},{"../config/config":7,"./mob":15}],19:[function(require,module,exports){
 const config = require("../config/config")
 const Mob = require("./mob")
 const shedevil = new Mob(config.mobNames.shedevil, 4, 69)
 module.exports = shedevil;
-},{"../config/config":7,"./mob":13}],18:[function(require,module,exports){
+},{"../config/config":7,"./mob":15}],20:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -826,7 +835,7 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function (process,__dirname){(function (){
 // builtin
 var fs = require('fs');
@@ -1175,9 +1184,9 @@ function getReplacements(info, browser) {
 module.exports = resolve;
 
 }).call(this)}).call(this,require('_process'),"/node_modules/browser-resolve")
-},{"_process":33,"fs":20,"path":31,"resolve":34}],20:[function(require,module,exports){
+},{"_process":35,"fs":22,"path":33,"resolve":36}],22:[function(require,module,exports){
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (Buffer){(function (){
 /*!
  * The buffer module from node.js, for the browser.
@@ -2958,7 +2967,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":18,"buffer":21,"ieee754":27}],22:[function(require,module,exports){
+},{"base64-js":20,"buffer":23,"ieee754":29}],24:[function(require,module,exports){
 (function (Buffer){(function (){
 //  Chance.js 1.1.9
 //  http://chancejs.com
@@ -10884,7 +10893,7 @@ options,
 })();
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"buffer":21}],23:[function(require,module,exports){
+},{"buffer":23}],25:[function(require,module,exports){
 const browserResolve = require('browser-resolve');
 const nodeResolve = require('resolve');
 
@@ -10930,7 +10939,7 @@ module.exports = function (id, opts, cb) {
   return resolve(id, opts, cb);
 };
 
-},{"browser-resolve":19,"resolve":34}],24:[function(require,module,exports){
+},{"browser-resolve":21,"resolve":36}],26:[function(require,module,exports){
 'use strict';
 
 /* eslint no-invalid-this: 1 */
@@ -10984,21 +10993,21 @@ module.exports = function bind(that) {
     return bound;
 };
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 var implementation = require('./implementation');
 
 module.exports = Function.prototype.bind || implementation;
 
-},{"./implementation":24}],26:[function(require,module,exports){
+},{"./implementation":26}],28:[function(require,module,exports){
 'use strict';
 
 var bind = require('function-bind');
 
 module.exports = bind.call(Function.call, Object.prototype.hasOwnProperty);
 
-},{"function-bind":25}],27:[function(require,module,exports){
+},{"function-bind":27}],29:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -11085,7 +11094,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 module.exports={
 	"assert": true,
 	"node:assert": [">= 14.18 && < 15", ">= 16"],
@@ -11242,7 +11251,7 @@ module.exports={
 	"node:zlib": [">= 14.18 && < 15", ">= 16"]
 }
 
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 (function (process){(function (){
 'use strict';
 
@@ -11315,7 +11324,7 @@ module.exports = function isCore(x, nodeVersion) {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./core.json":28,"_process":33,"has":26}],30:[function(require,module,exports){
+},{"./core.json":30,"_process":35,"has":28}],32:[function(require,module,exports){
 exports.endianness = function () { return 'LE' };
 
 exports.hostname = function () {
@@ -11366,7 +11375,7 @@ exports.homedir = function () {
 	return '/'
 };
 
-},{}],31:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 (function (process){(function (){
 // 'path' module extracted from Node.js v8.11.1 (only the posix part)
 // transplited with Babel
@@ -11899,7 +11908,7 @@ posix.posix = posix;
 module.exports = posix;
 
 }).call(this)}).call(this,require('_process'))
-},{"_process":33}],32:[function(require,module,exports){
+},{"_process":35}],34:[function(require,module,exports){
 (function (process){(function (){
 'use strict';
 
@@ -11978,7 +11987,7 @@ module.exports.posix = posix.parse;
 module.exports.win32 = win32.parse;
 
 }).call(this)}).call(this,require('_process'))
-},{"_process":33}],33:[function(require,module,exports){
+},{"_process":35}],35:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -12164,7 +12173,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],34:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var async = require('./lib/async');
 async.core = require('./lib/core');
 async.isCore = require('./lib/is-core');
@@ -12172,7 +12181,7 @@ async.sync = require('./lib/sync');
 
 module.exports = async;
 
-},{"./lib/async":35,"./lib/core":38,"./lib/is-core":40,"./lib/sync":43}],35:[function(require,module,exports){
+},{"./lib/async":37,"./lib/core":40,"./lib/is-core":42,"./lib/sync":45}],37:[function(require,module,exports){
 (function (process){(function (){
 var fs = require('fs');
 var getHomedir = require('./homedir');
@@ -12505,7 +12514,7 @@ module.exports = function resolve(x, options, callback) {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./caller":36,"./homedir":39,"./node-modules-paths":41,"./normalize-options":42,"_process":33,"fs":20,"is-core-module":29,"path":31}],36:[function(require,module,exports){
+},{"./caller":38,"./homedir":41,"./node-modules-paths":43,"./normalize-options":44,"_process":35,"fs":22,"is-core-module":31,"path":33}],38:[function(require,module,exports){
 module.exports = function () {
     // see https://code.google.com/p/v8/wiki/JavaScriptStackTraceApi
     var origPrepareStackTrace = Error.prepareStackTrace;
@@ -12515,7 +12524,7 @@ module.exports = function () {
     return stack[2].getFileName();
 };
 
-},{}],37:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 module.exports={
 	"assert": true,
 	"node:assert": [">= 14.18 && < 15", ">= 16"],
@@ -12670,7 +12679,7 @@ module.exports={
 	"node:zlib": [">= 14.18 && < 15", ">= 16"]
 }
 
-},{}],38:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 (function (process){(function (){
 var current = (process.versions && process.versions.node && process.versions.node.split('.')) || [];
 
@@ -12726,7 +12735,7 @@ for (var mod in data) { // eslint-disable-line no-restricted-syntax
 module.exports = core;
 
 }).call(this)}).call(this,require('_process'))
-},{"./core.json":37,"_process":33}],39:[function(require,module,exports){
+},{"./core.json":39,"_process":35}],41:[function(require,module,exports){
 (function (process){(function (){
 'use strict';
 
@@ -12754,14 +12763,14 @@ module.exports = os.homedir || function homedir() {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"_process":33,"os":30}],40:[function(require,module,exports){
+},{"_process":35,"os":32}],42:[function(require,module,exports){
 var isCoreModule = require('is-core-module');
 
 module.exports = function isCore(x) {
     return isCoreModule(x);
 };
 
-},{"is-core-module":29}],41:[function(require,module,exports){
+},{"is-core-module":31}],43:[function(require,module,exports){
 var path = require('path');
 var parse = path.parse || require('path-parse'); // eslint-disable-line global-require
 
@@ -12805,7 +12814,7 @@ module.exports = function nodeModulesPaths(start, opts, request) {
     return opts && opts.paths ? dirs.concat(opts.paths) : dirs;
 };
 
-},{"path":31,"path-parse":32}],42:[function(require,module,exports){
+},{"path":33,"path-parse":34}],44:[function(require,module,exports){
 module.exports = function (x, opts) {
     /**
      * This file is purposefully a passthrough. It's expected that third-party
@@ -12817,7 +12826,7 @@ module.exports = function (x, opts) {
     return opts || {};
 };
 
-},{}],43:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 (function (process){(function (){
 var isCore = require('is-core-module');
 var fs = require('fs');
@@ -13029,7 +13038,7 @@ module.exports = function resolveSync(x, options) {
 };
 
 }).call(this)}).call(this,require('_process'))
-},{"./caller":36,"./homedir":39,"./node-modules-paths":41,"./normalize-options":42,"_process":33,"fs":20,"is-core-module":29,"path":31}],44:[function(require,module,exports){
+},{"./caller":38,"./homedir":41,"./node-modules-paths":43,"./normalize-options":44,"_process":35,"fs":22,"is-core-module":31,"path":33}],46:[function(require,module,exports){
 "use strict";
 
 // setRandomMobber assigns a random mob from the array of mobs, then removes that random mobber from the array
@@ -13056,29 +13065,29 @@ function setRandomMobber() {
 }
 module.exports = setRandomMobber;
 
-},{"./mobs/mobs":14,"chance":22}],45:[function(require,module,exports){
+},{"./mobs/mobs":16,"chance":24}],47:[function(require,module,exports){
 const config = require("../config/config");
 const Spell = require("./spell");
 
 const chokesmoke = new Spell(config.spellNames.chokesmoke, 7, 10)
 module.exports = chokesmoke;
-},{"../config/config":7,"./spell":49}],46:[function(require,module,exports){
+},{"../config/config":7,"./spell":51}],48:[function(require,module,exports){
 const config = require("../config/config");
 const Spell = require("./spell")
 const Fireball = new Spell(config.spellNames.fireball, 10, 20)
 module.exports = Fireball;
-},{"../config/config":7,"./spell":49}],47:[function(require,module,exports){
+},{"../config/config":7,"./spell":51}],49:[function(require,module,exports){
 const config = require("../config/config");
 const Spell = require("./spell")
 const lightheal = new Spell(config.spellNames.lightheal, -5, 20)
 module.exports = lightheal;
-},{"../config/config":7,"./spell":49}],48:[function(require,module,exports){
+},{"../config/config":7,"./spell":51}],50:[function(require,module,exports){
 const config = require("../config/config");
 const Spell = require("./spell");
 
 const poisoncloud = new Spell(config.spellNames.poisoncloud, 20,30)
 module.exports = poisoncloud
-},{"../config/config":7,"./spell":49}],49:[function(require,module,exports){
+},{"../config/config":7,"./spell":51}],51:[function(require,module,exports){
 class Spell {
     constructor(name, power, mana){
         this.name = name;
@@ -13088,7 +13097,7 @@ class Spell {
     }
 }
 module.exports = Spell;
-},{}],50:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 
 //this hides the select buttons and unhides the info block
 function toggleCharacterDisplay(){
@@ -13103,17 +13112,17 @@ function toggleCharacterDisplay(){
 
 }
 module.exports = toggleCharacterDisplay
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 const config = require("../config/config")
 const Weapon = require("./weapon")
 const bastardsword = new Weapon(config.weaponNames.bastardsword, 10)
 module.exports = bastardsword;
-},{"../config/config":7,"./weapon":53}],52:[function(require,module,exports){
+},{"../config/config":7,"./weapon":55}],54:[function(require,module,exports){
 const config = require("../config/config");
 const Weapon = require("./weapon")
 const morningstar = new Weapon(config.weaponNames.morningstar, 7)
 module.exports = morningstar;
-},{"../config/config":7,"./weapon":53}],53:[function(require,module,exports){
+},{"../config/config":7,"./weapon":55}],55:[function(require,module,exports){
 class Weapon {
     constructor(name, damage){
         this.name = name;
@@ -13121,4 +13130,4 @@ class Weapon {
     }
 }
 module.exports = Weapon;
-},{}]},{},[10]);
+},{}]},{},[11]);
