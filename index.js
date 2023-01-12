@@ -49,7 +49,7 @@ async function gameLoop() {
         displayChoices(character);
 
         //now wait for the user to click a button
-        const choice = await waitForChoice(character);
+        const choice = await waitForChoice();
         console.log(choice)
 
         characterDamage = character.getDamage(choice);
@@ -85,7 +85,7 @@ function displayChoices(character) {
     }
 
 }
-function displaySpellChoices(character){
+function displaySpellChoices(){
     if(character.spells[0]){
         const spellChoicesContainer = document.getElementById("spell-choices-container")
         for(let i=0; i< character.spells.length; i++){
@@ -100,7 +100,7 @@ function displaySpellChoices(character){
     }
 }
 
-function waitForSpellChoice(character){
+function waitForSpellChoice(){
     let spellChoice;
     const spell0button = document.getElementById("spell0");
     const spell1button = document.getElementById("spell1");
@@ -124,18 +124,18 @@ function waitForSpellChoice(character){
     })
 }
 
-
-function waitForChoice(character) {
+function waitForChoice() {
+    let spellChoice;
     const fightButton = document.getElementById("attack")
     const spellButton = document.getElementById("cast-spell")
-    console.log(`here i am bo ${character}`)
+    console.log(character)
     return new Promise((resolve)=>{
         fightButton.addEventListener("click", ()=>{
             resolve("fight");  
         })
         spellButton.addEventListener("click", ()=>{
             displaySpellChoices();
-            let spellChoice = waitForSpellChoice(character);
+            spellChoice = waitForSpellChoice();
             console.log(spellChoice)
             resolve(spellChoice)
 
