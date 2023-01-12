@@ -57,6 +57,10 @@ async function gameLoop() {
         characterDamage = character.getDamage(choice);
         mobdamage = randomMobber.getDamage();
         character.health -= mobdamage;
+        if (character.getHealth() < 0){
+            alert("Game over loser")
+            return;
+        }
         randomMobber.health -= characterDamage;
         
         hideButtons();
@@ -73,6 +77,7 @@ async function gameLoop() {
             //this is where the round winning sound/animation goes
         }
         displayCharacterInfo(character);
+       
     }
 }
 

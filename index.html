@@ -7,46 +7,48 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
-    <div id="header">Fite me</div>
+    <div class = "main-container" id="header">Fite me</div>
 </head>
 
 <body id="body">
-    <div id="character-select-container">
-        <h1>Choose a Class</h1>
-        <button id="shaman" data-class="shaman">Shaman</button>
-        <button id="mage" data-class="mage">Mage</button>
-        <button id="warlock" data-class="warlock">Warlock</button>
-
-    </div>
-    <div id="character-info-container" style="display:none;">
-        <h1>Character Info</h1>
-        <div id="character-info"></div>
-    </div>
-    <div id = "mob-info-container" style="display:none;">
-        <h1>Mob Info</h1>
-        <div id ="mob-info">
+    <div class="main-container">
+        <div id="character-select-container">
+            <h1>Choose a Class</h1>
+            <button id="shaman" data-class="shaman">Shaman</button>
+            <button id="mage" data-class="mage">Mage</button>
+            <button id="warlock" data-class="warlock">Warlock</button>
 
         </div>
-    </div>
-    <div id ="choices-container" style="display: none">
-        <h1>Whatcha gonna do?</h1>
-        <div id ="choices">
-            <button id ="attack">Attack</button>
-            <button id="equip-weapon">Equip Weapon</button>
-            <button id="cast-spell">Cast Spell</button>
-            <button id="summon-pet">Summon Pet</button>
+        <div id="character-info-container" style="display:none;">
+            <h1>Character Info</h1>
+            <div id="character-info"></div>
         </div>
-        <div id="spell-choices-container" style="display:none">
-            <h3>Cast a spell</h3>
-            <div id ="spell-choices"></div>
+        <div id="mob-info-container" style="display:none;">
+            <h1>Mob Info</h1>
+            <div id="mob-info">
+
+            </div>
         </div>
-        <div id="weapon-choices-container" style="display: none;">
-            <h3>Equip a weapon</h3>
-            <div id="weapon-choices"></div>
-        </div>
-        <div id="pet-choices-container" style="display: none;">
-            <h3>Summon a Pet</h3>
-            <div id="pet-choice"></div>
+        <div id="choices-container" style="display: none">
+            <h1>Whatcha gonna do?</h1>
+            <div id="choices">
+                <button id="attack">Attack</button>
+                <button id="equip-weapon">Equip Weapon</button>
+                <button id="cast-spell">Cast Spell</button>
+                <button id="summon-pet">Summon Pet</button>
+            </div>
+            <div id="spell-choices-container" style="display:none">
+                <h3>Cast a spell</h3>
+                <div id="spell-choices"></div>
+            </div>
+            <div id="weapon-choices-container" style="display: none;">
+                <h3>Equip a weapon</h3>
+                <div id="weapon-choices"></div>
+            </div>
+            <div id="pet-choices-container" style="display: none;">
+                <h3>Summon a Pet</h3>
+                <div id="pet-choice"></div>
+            </div>
         </div>
     </div>
     <script src="bundle.js"></script>

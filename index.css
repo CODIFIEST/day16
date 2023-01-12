@@ -5,3 +5,11 @@ body {
     background: black;
     color: aliceblue
 }
+.main-container {
+    display: flex;
+    justify-content: center;
+    margin: 11px 0px 0px 0px;
+}
+div{
+    margin: 10px;
+}
