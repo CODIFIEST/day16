@@ -8,7 +8,8 @@ const config = {
     spellNames:{
         fireball: "Fireball",
         lightheal: "Light Heal",
-        poisoncloud: "Poison Cloud"
+        poisoncloud: "Poison Cloud",
+        chokesmoke: "Choke Smoke"
     },
     weaponNames: {
         morningstar: "Morning Star",

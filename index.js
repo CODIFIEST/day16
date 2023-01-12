@@ -4,43 +4,119 @@
 //it should be the type 'character' from characters/charcters.js and an instance of that character, meaning
 // that iti s either a Shaman, warlock, or Mage
 
-console.log("hello from bundlerama");
-
-const Mage = require("./characters/mage");
-const Shaman = require("./characters/shaman");
-const Warlock = require("./characters/warlock");
-const config = require("./config/config");
-
+const resolve = require("esmify/resolve");
+const chooseClass = require("./chooseClass");
+const displayCharacterInfo = require("./displayCharacterInfo");
+const displayMobInfo = require("./displayMobInfo");
+const setRandomMobber = require("./setrandomMobber");
+const toggleCharacterDisplay = require("./toggleCharacterDisplay");
+// this will be the character chosen by the player
 let character;
-function chooseClass(classType) {
-    if(classType === config.classNames.MageClassName){
-        character = new Mage("Channing Taintum");
-    }else if (classType === config.classNames.ShamanClassName){
-        character = new Shaman("Pauly Stamets");
-    }else if (classType === config.classNames.WarlockClassName){
-        character = new Warlock("Wonklock")
-    }
-    console.log(character)
-    toggleCharacterDisplay();
-}
+// this is the current randomly spawned mob, based on the `mob` class
+let randomMobber;
+
 const mageButton = document.getElementById("mage");
 const shamanButton = document.getElementById("shaman");
 const warlockButton = document.getElementById("warlock");
-
-mageButton.addEventListener("click", function(){
-    chooseClass("Mage")
-
+// these buttons will determine the player's class and intialize the game with that class
+mageButton.addEventListener("click", function () {
+    initGame("Mage")
 });
-shamanButton.addEventListener("click", function(){
-    chooseClass("Shaman")
+shamanButton.addEventListener("click", function () {
+    initGame("Shaman")
 })
-warlockButton.addEventListener("click", function(){
-    chooseClass("Warlock")
+warlockButton.addEventListener("click", function () {
+    initGame("Warlock")
 })
-function toggleCharacterDisplay(){
-    const characterSelectContainer = document.getElementById("character-select-container");
-    characterSelectContainer.style.display = "none";
 
-    const characterInfo = document.getElementById("character-info-container");
-    characterInfo.style.display = "block";
+// initGame can take a classType and create a new character based on it
+// then it toggles the select buttons and displays teh character info
+function initGame(classType) {
+    character = chooseClass(classType);
+    toggleCharacterDisplay();
+    displayCharacterInfo(character);
+    gameLoop();
 }
+
+// gameloop starts with character created and info displayed but no other data initialized
+async function gameLoop() {
+    randomMobber = setRandomMobber();
+    displayMobInfo(randomMobber);
+
+    while (character.getHealth() > 0 && randomMobber.getHealth() > 0) {
+        //this is the fight logic
+        //display the user's options
+        displayChoices(character);
+
+        //now wait for the user to click a button
+        const choice = await waitForChoice(character);
+        console.log(choice)
+
+        characterDamage = character.getDamage(choice);
+        mobdamage = randomMobber.getDamage();
+console.log("char damage ", characterDamage);
+console.log(mobdamage);
+        character.health -= mobdamage;
+        randomMobber.health -= characterDamage;
+        displayCharacterInfo(character);
+        displayMobInfo(randomMobber);
+
+    }
+}
+// this function dispalys the choices a character has
+// only display cast spell button if the character has spells
+//only display weapons or pets buttons if the character has those.
+function displayChoices(character) {
+
+    const container = document.getElementById("choices-container")
+    container.style.display = "block"
+    if(!character.spells[0]){
+        const castSpellButton = document.getElementById("cast-spell")
+        castSpellButton.style.display = "none"
+    }
+    if(!character.weapons[0]){
+        const equipEaponButton = document.getElementById("equip-weapon")
+        equipEaponButton.style.display= "none";
+    }
+    if(!character.pets[0]){
+        const summonPetButton = document.getElementById("summon-pet")
+        summonPetButton.style.display= "none";
+    }
+
+}
+function displaySpellChoices(character){
+    if(character.spells[0]){
+        const spellChoicesContainer = document.getElementById("spell-choices-container")
+        for(let i=0; i< character.spells.length; i++){
+            const mySpell = document.createElement("button")
+            mySpell.classList.add(`#spell${i}`)
+            spellChoicesContainer.appendChild(mySpell)
+            // const mySpell = document.getElementById(`spell${i}`)
+            mySpell.innerHTML = character.spells[i].name;
+        }
+    
+    spellChoicesContainer.style.display = "block";
+    }
+}
+
+function waitForChoice(character) {
+    const fightButton = document.getElementById("attack")
+    const spellButton = document.getElementById("cast-spell")
+    const spell0button = document.getElementById("spell0")
+    const spell1button = document.getElementById("spell1")
+    const spell2button = document.getElementById("spell2")
+    return new Promise((resolve)=>{
+        fightButton.addEventListener("click", ()=>{
+            resolve("fight");  
+        })
+        spellButton.addEventListener("click", ()=>{
+            displaySpellChoices(character);
+            
+            resolve("fireball")
+
+        })
+    });
+  
+  
+}
+

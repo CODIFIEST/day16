@@ -4,6 +4,9 @@ class Pet{
         this.damage = damage;
         this.damageType= damageType;
     }
+    getName(){
+        return this.name;
+    }
   
 }
 module.exports = Pet;

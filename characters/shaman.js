@@ -4,6 +4,8 @@ const bastardsword = require("../weapons/bastardsword")
 const lightheal = require("../spells/lightheal")
 const Character = require("./character");
 const config = require("../config/config");
+const poisoncloud = require("../spells/poisoncloud");
+const chokesmoke = require("../spells/chokesmoke");
 class Shaman extends Character {
     constructor (name, health){
         //Create the pet inside the constructor like from class
@@ -14,6 +16,8 @@ class Shaman extends Character {
         this.weapons.push(morningstar);
         this.weapons.push(bastardsword);
         this.spells.push(lightheal);
+        this.spells.push(poisoncloud);
+        this.spells.push(chokesmoke);
     }
 }
 module.exports = Shaman;
