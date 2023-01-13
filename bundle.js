@@ -199,7 +199,7 @@ class Character {
 }
 
 module.exports = Character;
-},{"../config/config":7,"../spells/spell":51}],2:[function(require,module,exports){
+},{"../config/config":7,"../spells/spell":53}],2:[function(require,module,exports){
 const Character = require("./character")
 const fireball = require("../spells/fireball");
 const config = require("../config/config");
@@ -210,7 +210,7 @@ class Mage extends Character{
     }
 }
 module.exports = Mage;
-},{"../config/config":7,"../spells/fireball":48,"./character":1}],3:[function(require,module,exports){
+},{"../config/config":7,"../spells/fireball":50,"./character":1}],3:[function(require,module,exports){
 class Pet{
     constructor(name, damage, damageType){
         this.name = name;
@@ -247,7 +247,7 @@ class Shaman extends Character {
     }
 }
 module.exports = Shaman;
-},{"../config/config":7,"../spells/chokesmoke":47,"../spells/lightheal":49,"../spells/poisoncloud":50,"../weapons/bastardsword":53,"../weapons/morningstar":54,"./character":1,"./pet":3}],5:[function(require,module,exports){
+},{"../config/config":7,"../spells/chokesmoke":49,"../spells/lightheal":51,"../spells/poisoncloud":52,"../weapons/bastardsword":55,"../weapons/morningstar":56,"./character":1,"./pet":3}],5:[function(require,module,exports){
 const Pet = require("./pet")
 const Character = require ("./character");
 const config = require("../config/config");
@@ -327,21 +327,47 @@ function displayChoices(character) {
 
     const container = document.getElementById("choices-container")
     container.style.display = "block"
-    if (!character.spells[0]) {
-        const castSpellButton = document.getElementById("cast-spell")
-        castSpellButton.style.display = "none"
-    }
-    if (!character.weapons[0]) {
-        const equipEaponButton = document.getElementById("equip-weapon")
-        equipEaponButton.style.display = "none";
-    }
-    if (!character.pets[0]) {
-        const summonPetButton = document.getElementById("summon-pet")
-        summonPetButton.style.display = "none";
+    if (character.weapons[0]) {
+        const weaponButton = document.getElementById("equip-weapon")
+        weaponButton.style.display = "inline-block"
     }
 
+    if (character.pets[0]) {
+        const petButton = document.getElementById("summon-pet")
+        petButton.style.display = "inline-block"
+    }
+    if (character.spells[0]){
+        const spellButton = document.getElementById("cast-spell")
+        spellButton.style.display = "inline-block"
+
+    }
 }
 module.exports = displayChoices
+
+
+// function displaySpellChoices(character) {
+//     if (character.spells[0]) {
+//         const spellChoicesContainer = document.getElementById("spell-choices-container")
+//         spellChoicesContainer.style.display = "block";
+//     }
+// } 
+// module.exports = displaySpellChoices
+
+// function displayWeaponChoices(character) {
+//     if (character.weapons[0]) {
+//         const weaponChoicesContainer = document.getElementById("weapon-choices-container");
+//         weaponChoicesContainer.style.display = "block"
+//     }
+// }
+// module.exports = displayWeaponChoices
+
+// function displaypetChoices(character) {
+//     if (character.pets[0]) {
+//         const petChoicesContainer = document.getElementById("pet-choices-container");
+//         petChoicesContainer.style.display = "block"
+//     }
+// }
+// module.exports = displaypetChoices
 },{}],10:[function(require,module,exports){
 
 // displayMobInfo displays the random mobber's info to the screen
@@ -367,13 +393,14 @@ const displayCharacterInfo = require("./displayCharacterInfo");
 const displayChoices = require("./displayChoices");
 const displayMobInfo = require("./displayMobInfo");
 const loadButtons = require("./loadButtons");
+const playHitSound = require("./sounds/playSounds");
 const setRandomMobber = require("./setrandomMobber");
 const toggleCharacterDisplay = require("./toggleCharacterDisplay");
+const playDeathSound = require("./sounds/playDeathSound");
 // this will be the character chosen by the player
 let character;
 // this is the current randomly spawned mob, based on the `mob` class
 let randomMobber;
-
 const mageButton = document.getElementById("mage");
 const shamanButton = document.getElementById("shaman");
 const warlockButton = document.getElementById("warlock");
@@ -410,16 +437,18 @@ async function gameLoop() {
 
         //now wait for the user to click a button
         const choice = await waitForChoice(character);
-
+        // once the choice is returned, play a whack sound
+        playHitSound();
         characterDamage = character.getDamage(choice);
         mobdamage = randomMobber.getDamage();
         character.health -= mobdamage;
-        if (character.getHealth() < 0){
+        if (character.getHealth() < 0) {
+            playDeathSound();
             alert("Game over loser")
             return;
         }
         randomMobber.health -= characterDamage;
-        
+
         hideButtons();
         displayMobInfo(randomMobber);
         //this loop checks for dead mobbers and end of game
@@ -427,17 +456,24 @@ async function gameLoop() {
             if (mobs.length > 0) {
                 randomMobber = setRandomMobber();
                 displayMobInfo(randomMobber);
-            }else {
-            alert("You win")//this is the end of the game
+            } else {
+                playWuhuSound();
+                alert("You win")//this is the end of the game
             }
             character.levelUp();
+            playDeathSound();
             //this is where the round winning sound/animation goes
         }
         displayCharacterInfo(character);
-       
+
     }
 }
 
+
+function playWuhuSound() {
+    let sound = document.getElementById("sound-wuhu")
+    sound.play();
+}
 function displaySpellChoices(character) {
     if (character.spells[0]) {
         const spellChoicesContainer = document.getElementById("spell-choices-container")
@@ -585,7 +621,7 @@ function waitForChoice(character) {
 
 }
 
-},{"./chooseClass":6,"./displayCharacterInfo":8,"./displayChoices":9,"./displayMobInfo":10,"./loadButtons":12,"./setrandomMobber":46,"./toggleCharacterDisplay":52,"esmify/resolve":25}],12:[function(require,module,exports){
+},{"./chooseClass":6,"./displayCharacterInfo":8,"./displayChoices":9,"./displayMobInfo":10,"./loadButtons":12,"./setrandomMobber":46,"./sounds/playDeathSound":47,"./sounds/playSounds":48,"./toggleCharacterDisplay":54,"esmify/resolve":25}],12:[function(require,module,exports){
 
 function loadButtons(character) {
     if (character.spells[0]) {
@@ -13071,28 +13107,48 @@ function setRandomMobber() {
 module.exports = setRandomMobber;
 
 },{"./mobs/mobs":16,"chance":24}],47:[function(require,module,exports){
+function playDeathSound() {
+    let ugh = document.getElementById("sound-ugh")
+    ugh.play();
+}
+module.exports = playDeathSound;
+
+},{}],48:[function(require,module,exports){
+function playHitSound() {
+    let whack = document.getElementById("sound-whack")
+    whack.play();
+}
+module.exports = playHitSound;
+
+
+// function playWuhuSound() {
+//     let sound = document.getElementById("sound-wuhu")
+//     sound.play();
+// }
+// module.exports = playWuhuSound;
+},{}],49:[function(require,module,exports){
 const config = require("../config/config");
 const Spell = require("./spell");
 
 const chokesmoke = new Spell(config.spellNames.chokesmoke, 7, 10)
 module.exports = chokesmoke;
-},{"../config/config":7,"./spell":51}],48:[function(require,module,exports){
+},{"../config/config":7,"./spell":53}],50:[function(require,module,exports){
 const config = require("../config/config");
 const Spell = require("./spell")
 const Fireball = new Spell(config.spellNames.fireball, 10, 20)
 module.exports = Fireball;
-},{"../config/config":7,"./spell":51}],49:[function(require,module,exports){
+},{"../config/config":7,"./spell":53}],51:[function(require,module,exports){
 const config = require("../config/config");
 const Spell = require("./spell")
 const lightheal = new Spell(config.spellNames.lightheal, -5, 20)
 module.exports = lightheal;
-},{"../config/config":7,"./spell":51}],50:[function(require,module,exports){
+},{"../config/config":7,"./spell":53}],52:[function(require,module,exports){
 const config = require("../config/config");
 const Spell = require("./spell");
 
 const poisoncloud = new Spell(config.spellNames.poisoncloud, 20,30)
 module.exports = poisoncloud
-},{"../config/config":7,"./spell":51}],51:[function(require,module,exports){
+},{"../config/config":7,"./spell":53}],53:[function(require,module,exports){
 class Spell {
     constructor(name, power, mana){
         this.name = name;
@@ -13102,7 +13158,7 @@ class Spell {
     }
 }
 module.exports = Spell;
-},{}],52:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 
 //this hides the select buttons and unhides the info block
 function toggleCharacterDisplay(){
@@ -13117,17 +13173,17 @@ function toggleCharacterDisplay(){
 
 }
 module.exports = toggleCharacterDisplay
-},{}],53:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 const config = require("../config/config")
 const Weapon = require("./weapon")
 const bastardsword = new Weapon(config.weaponNames.bastardsword, 10)
 module.exports = bastardsword;
-},{"../config/config":7,"./weapon":55}],54:[function(require,module,exports){
+},{"../config/config":7,"./weapon":57}],56:[function(require,module,exports){
 const config = require("../config/config");
 const Weapon = require("./weapon")
 const morningstar = new Weapon(config.weaponNames.morningstar, 7)
 module.exports = morningstar;
-},{"../config/config":7,"./weapon":55}],55:[function(require,module,exports){
+},{"../config/config":7,"./weapon":57}],57:[function(require,module,exports){
 class Weapon {
     constructor(name, damage){
         this.name = name;

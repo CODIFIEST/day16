@@ -10,13 +10,14 @@ const displayCharacterInfo = require("./displayCharacterInfo");
 const displayChoices = require("./displayChoices");
 const displayMobInfo = require("./displayMobInfo");
 const loadButtons = require("./loadButtons");
+const playHitSound = require("./sounds/playSounds");
 const setRandomMobber = require("./setrandomMobber");
 const toggleCharacterDisplay = require("./toggleCharacterDisplay");
+const playDeathSound = require("./sounds/playDeathSound");
 // this will be the character chosen by the player
 let character;
 // this is the current randomly spawned mob, based on the `mob` class
 let randomMobber;
-
 const mageButton = document.getElementById("mage");
 const shamanButton = document.getElementById("shaman");
 const warlockButton = document.getElementById("warlock");
@@ -53,16 +54,18 @@ async function gameLoop() {
 
         //now wait for the user to click a button
         const choice = await waitForChoice(character);
-
+        // once the choice is returned, play a whack sound
+        playHitSound();
         characterDamage = character.getDamage(choice);
         mobdamage = randomMobber.getDamage();
         character.health -= mobdamage;
-        if (character.getHealth() < 0){
+        if (character.getHealth() < 0) {
+            playDeathSound();
             alert("Game over loser")
             return;
         }
         randomMobber.health -= characterDamage;
-        
+
         hideButtons();
         displayMobInfo(randomMobber);
         //this loop checks for dead mobbers and end of game
@@ -70,17 +73,24 @@ async function gameLoop() {
             if (mobs.length > 0) {
                 randomMobber = setRandomMobber();
                 displayMobInfo(randomMobber);
-            }else {
-            alert("You win")//this is the end of the game
+            } else {
+                playWuhuSound();
+                alert("You win")//this is the end of the game
             }
             character.levelUp();
+            playDeathSound();
             //this is where the round winning sound/animation goes
         }
         displayCharacterInfo(character);
-       
+
     }
 }
 
+
+function playWuhuSound() {
+    let sound = document.getElementById("sound-wuhu")
+    sound.play();
+}
 function displaySpellChoices(character) {
     if (character.spells[0]) {
         const spellChoicesContainer = document.getElementById("spell-choices-container")

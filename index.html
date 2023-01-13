@@ -33,9 +33,9 @@
             <h1>Whatcha gonna do?</h1>
             <div id="choices">
                 <button id="attack">Attack</button>
-                <button id="equip-weapon">Equip Weapon</button>
-                <button id="cast-spell">Cast Spell</button>
-                <button id="summon-pet">Summon Pet</button>
+                <button id="equip-weapon" style="display:none">Equip Weapon</button>
+                <button id="cast-spell" style="display:none">Cast Spell</button>
+                <button id="summon-pet" style="display:none">Summon Pet</button>
             </div>
             <div id="spell-choices-container" style="display:none">
                 <h3>Cast a spell</h3>
@@ -51,6 +51,16 @@
             </div>
         </div>
     </div>
+    <audio id="sound-ugh">
+        <source src ="./sounds/ugh.mp3"></source>
+    </audio>
+    <audio id="sound-whack">
+        <source src ="./sounds/whack.mp3"></source>
+    </audio>    
+    <audio id="sound-wuhu">
+        <source src ="./sounds/wuhu.mp3"></source>
+    </audio>
+    
     <script src="bundle.js"></script>
 </body>
 
